@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conductor's Digital Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Caveat:wght@500;700&family=VT323&family=Hind:wght@500;600;700&family=Public+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout concept: a case study read top to bottom like a ticket roll. Narrative sections in a single column, with real phone frames built from the same renderer as the live prototype. Deliberately one light theme: the product is designed for glare, so the page shows it on white. */
+:root{
+  --navy:#0F1B3D;
+  --ink2:#3A4668;
+  --violet:#5B2EE0;
+  --violet-t:#ECE8FD;
+  --teal:#087061;
+  --teal-t:#D3F0EA;
+  --amber:#8A4300;
+  --amber-t:#FFEBC2;
+  --rose:#B3261E;
+  --rose-t:#FCE3E0;
+  --paper:#F3F4FA;
+  --line:#CCD1E4;
+  --white:#FFFFFF;
+  --font-display:'Archivo','Arial Narrow',system-ui,sans-serif;
+  --font-ui:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-num:'Archivo',system-ui,sans-serif;
+  --font-mono:'VT323','Courier New',monospace;
+  --font-hand:'Caveat','Bradley Hand',cursive;
+  --font-hi:'Hind','Nirmala UI','Noto Sans Devanagari',sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-variant-numeric:tabular-nums;margin:0;background:var(--white);color:var(--navy);font-family:var(--font-ui);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin-inline:auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;line-height:1.08;letter-spacing:-.02em}
+h1{font-size:clamp(2.6rem,7.5vw,4.8rem);font-weight:800;letter-spacing:-.025em;line-height:1.02;font-stretch:108%}
+.mark{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 14' preserveAspectRatio='none'%3E%3Cpath d='M2 9 C38 2 78 13 118 7 S190 3 238 8' fill='none' stroke='%235B2EE0' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat 0 100%/100% 14px;padding-bottom:8px}
+h2{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;max-width:22ch}
+h3{font-size:1.1rem;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+p{margin:0}
+.eyebrow{font-family:var(--font-hand);font-size:1.6rem;line-height:1.1;color:var(--violet);font-weight:700}
+.lede{font-size:1.15rem;color:var(--ink2);max-width:60ch}
+.body{max-width:65ch;color:var(--ink2)}
+.sec{padding-block:64px;border-top:1px solid var(--line)}
+.sec-head{display:flex;flex-direction:column;gap:14px;margin-bottom:36px}
+a{color:var(--violet)}
+:focus-visible{outline:3px solid var(--violet);outline-offset:3px}
+
+/* Hero */
+.hero{padding-block:44px 56px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;align-items:center}
+.hero-copy{display:flex;flex-direction:column;gap:22px;min-width:0}
+.by{display:flex;flex-direction:column;gap:2px}
+.by b{font-size:1.05rem}
+.by span{color:var(--ink2);font-size:.95rem}
+.cons{display:flex;flex-wrap:wrap;gap:10px}
+.cons span{border:2px solid var(--navy);border-radius:999px;padding:6px 14px;font-weight:700;font-size:.95rem}
+.ticket{font-family:var(--font-mono);background:var(--white);border:2px solid var(--navy);padding:22px 22px 30px;font-size:22px;line-height:1.25;letter-spacing:.02em;position:relative;max-width:340px;justify-self:center;width:100%;box-shadow:8px 8px 0 var(--violet-t);transform:rotate(-2.5deg)}
+.ticket::after{content:"";position:absolute;left:-2px;right:-2px;bottom:-12px;height:12px;background:radial-gradient(circle at 8px -2px,var(--white) 7px,var(--navy) 7.5px,var(--navy) 9px,transparent 9.5px) 0 0/16px 12px repeat-x}
+.ticket .t-h{font-size:22px}
+.ticket .t-s{color:var(--rose);font-size:20px}
+.ticket .t-r{display:flex;justify-content:space-between;gap:12px}
+.ticket .t-big{font-size:64px;line-height:1;margin-block:6px}
+.hand{font-family:var(--font-hand);font-size:21px;line-height:1.1;color:var(--violet);margin-top:8px}
+.ticket hr{border:0;border-top:2px dashed var(--navy);margin:10px 0}
+
+/* Assumptions */
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px}
+.assume{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 18px;margin:0}
+.assume dt{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--navy)}
+.assume dd{margin:0}
+.flag{display:inline-block;background:var(--amber-t);color:var(--amber);font-weight:700;font-size:13px;padding:2px 10px;border-radius:6px}
+
+/* Observations */
+.obs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.obs article{border:2px solid var(--line);background:var(--paper);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.obs .tag{font-family:var(--font-display);font-size:.95rem;font-weight:700;color:var(--amber)}
+.obs p{color:var(--navy)}
+.learned{margin-top:36px;max-width:75ch}
+.learned ul{margin:14px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:10px;color:var(--ink2)}
+.learned b{color:var(--navy)}
+.obs .scen{background:var(--violet-t);color:var(--navy);font-size:.95rem;border-radius:8px;padding:10px 12px}
+.obs .fill{background:var(--amber-t);color:var(--amber);font-weight:600;font-size:.95rem;border-radius:8px;padding:8px 12px}
+
+/* Reachability */
+.reach{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.reach figure{margin:0;display:flex;flex-direction:column;gap:12px;align-items:center;background:var(--paper);padding:24px 16px;border-radius:18px}
+.reach svg{width:min(100%,230px);height:auto;display:block}
+.reach figcaption{font-family:var(--font-hand);font-size:1.5rem;line-height:1.1;font-weight:700;color:var(--navy)}
+.legend{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:22px}
+.legend span{display:flex;align-items:center;gap:10px;font-weight:600}
+.legend i{width:20px;height:20px;border-radius:5px;border:2px solid var(--navy);display:inline-block}
+.tablewrap{overflow-x:auto;margin-top:28px;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.95rem}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--font-display);font-size:.95rem;color:var(--navy);background:var(--paper);font-weight:700}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:700;white-space:nowrap}
+.z{font-weight:700}
+.z.e{color:var(--teal)}.z.s{color:var(--amber)}.z.h{color:var(--rose)}
+
+/* Decisions */
+.dec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.dec article{border-top:3px solid var(--navy);padding-top:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.dec .cost{font-size:.95rem;color:var(--ink2)}
+.dec .cost b{color:var(--navy)}
+.hap{display:flex;gap:22px;flex-wrap:wrap;margin-top:6px}
+.hap div{display:flex;flex-direction:column;gap:6px;font-size:.85rem;font-weight:600}
+.hap span{display:flex;gap:4px;height:22px;align-items:center}
+.hap i{display:block;background:var(--navy);height:22px;border-radius:3px}
+.hap i.s{width:8px}.hap i.l{width:34px}
+.layers{margin-top:44px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:32px;align-items:start}
+.layer{display:grid;grid-template-columns:96px minmax(0,1fr);gap:16px;padding:18px;border-radius:14px;margin-bottom:12px}
+.layer b{font-family:var(--font-display);font-size:1.15rem;font-weight:800}
+.layer.g{background:var(--navy);color:var(--white)}
+.layer.c{background:var(--paper)}
+.layer.a{background:var(--violet);color:var(--white)}
+.cut{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.cut span{border:2px solid var(--navy);border-radius:999px;padding:4px 12px;font-size:.9rem;font-weight:600;text-decoration:line-through;text-decoration-thickness:2px}
+
+/* Prototype */
+.proto{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:48px;align-items:start}
+.proto-side{display:flex;flex-direction:column;gap:24px;min-width:0}
+.steps{display:flex;flex-direction:column;gap:12px;padding:0;margin:0;list-style:none;counter-reset:s}
+.steps li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start}
+.steps li::before{content:"";background:var(--violet);width:12px;height:12px;border-radius:50%;margin-top:8px;justify-self:center}
+.clock{border:2px solid var(--navy);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.clock .big{font-family:var(--font-num);font-size:clamp(2rem,6vw,3rem);font-weight:500;line-height:1}
+.clock .v{font-weight:700}
+.clock .v.ok{color:var(--teal)}.clock .v.slow{color:var(--amber)}
+.bar{position:relative;height:14px;background:var(--paper);border-radius:7px;border:1px solid var(--line)}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--violet);border-radius:7px;width:0;transition:width .3s}
+.bar b{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--navy);left:100%;margin-left:-3px}
+.mini-btn{align-self:flex-start;font:inherit;font-weight:700;border:2px solid var(--navy);background:var(--white);color:var(--navy);padding:10px 18px;border-radius:10px;cursor:pointer;min-height:44px}
+.mini-btn:hover{background:var(--paper)}
+.sample-note{font-size:.88rem;color:var(--ink2)}
+.timeline{margin-top:40px;border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;background:var(--paper)}
+.tl-axis{position:relative;height:60px;margin:26px 8px 8px}
+.tl-axis::before{content:"";position:absolute;left:0;right:0;top:30px;height:4px;background:var(--navy);border-radius:2px}
+.tl-p{position:absolute;top:18px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px}
+.tl-p i{width:28px;height:28px;border-radius:50%;background:var(--violet);border:3px solid var(--white);box-shadow:0 0 0 2px var(--violet)}
+.tl-p.t i{background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+.tl-p span{font-family:var(--font-num);font-size:12px;white-space:nowrap;position:absolute;top:-24px}
+.tl-p em{font-style:normal;font-size:12px;font-weight:700;position:absolute;top:36px;white-space:nowrap}
+.tl-limit{position:absolute;top:2px;bottom:-4px;width:3px;background:var(--rose)}
+.tl-limit span{position:absolute;top:-24px;right:8px;font-family:var(--font-num);font-size:12px;font-weight:500;color:var(--rose);white-space:nowrap}
+
+/* Frames */
+.frames{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:44px 32px;justify-items:center;margin-top:56px}
+.frames figure{margin:0;display:flex;flex-direction:column;gap:16px;width:320px;max-width:100%}
+.frames figcaption{display:flex;flex-direction:column;gap:6px}
+.frames figcaption b{font-size:1.05rem}
+.frames figcaption span{color:var(--ink2);font-size:.95rem}
+.static{pointer-events:none}
+.cutcard{width:320px;max-width:100%;border:2px solid var(--navy);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:12px;align-self:start}
+
+/* Phone */
+.ph{width:320px;max-width:100%;height:652px;border:8px solid var(--navy);border-radius:36px;background:var(--white);overflow:hidden;display:flex;flex-direction:column;position:relative;font-family:var(--font-ui);color:var(--navy)}
+.ph button{font-family:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.p-top{background:var(--navy);color:var(--white);padding:10px 14px 10px;display:flex;flex-direction:column;gap:6px;height:124px;flex:none}
+.p-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.p-chip{white-space:nowrap;font-size:12px;font-weight:700;border:1.5px solid var(--white);border-radius:6px;padding:1px 7px}
+.p-stat{white-space:nowrap;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;font-family:var(--font-num)}
+.dot{width:9px;height:9px;border-radius:50%;background:#46D6B8;display:inline-block}
+.dot.amb{background:#F2A33A}
+.p-now small{display:block;font-size:11px;letter-spacing:.08em;font-weight:700;opacity:.85}
+.p-now b{font-size:17px;font-weight:800;line-height:1.15}
+.p-now .r{text-align:right}
+.p-tot{font-size:13px;line-height:1.2;font-family:var(--font-num)}
+.p-tot b{font-size:15px;font-weight:500}
+.p-lh{height:28px;flex:none;display:flex;align-items:center;padding-inline:14px;font-size:12px;font-weight:700;color:var(--ink2);border-bottom:2px solid var(--line)}
+.p-list{display:flex;flex-direction:column;flex:1;min-height:0}
+.p-stop{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:10px;height:64px;flex:none;width:100%;text-align:left;background:var(--white);border:0;border-bottom:2px solid var(--line);padding:0 14px;position:relative}
+.p-stop .nm{display:flex;flex-direction:column;min-width:0}
+.p-stop .nm b{font-size:19px;font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-stop .nm em{font-style:normal;font-family:var(--font-hi);font-weight:500;font-size:13px;color:var(--ink2);line-height:1.3}
+.p-stop .fare{font-family:var(--font-num);font-size:22px;font-weight:500;min-width:58px;text-align:right}
+.p-stop .badge{background:var(--violet);color:var(--white);font-weight:800;font-size:18px;min-width:46px;height:38px;border-radius:19px;display:grid;place-items:center}
+.p-stop.sel{background:var(--violet-t);box-shadow:inset 0 0 0 3px var(--violet)}
+.p-stop:active{background:var(--violet-t)}
+.p-bot{height:162px;flex:none;border-top:2px solid var(--navy);padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px;background:var(--white)}
+.p-sum{display:flex;align-items:center;justify-content:space-between;gap:10px;height:50px;flex:none}
+.p-sum.s{height:24px}
+.p-ghost{white-space:nowrap;border:2px solid var(--navy);background:var(--white);border-radius:12px;font-weight:700;font-size:14px;height:50px;padding:0 14px}
+.p-ghost[disabled]{opacity:.4;cursor:default}
+.sumtxt{white-space:nowrap;font-family:var(--font-num);font-size:15px;font-weight:500;text-align:right;min-width:0}
+.p-issue{flex:1;min-height:0;border:0;border-radius:16px;background:var(--violet);color:var(--white);font-size:28px;font-weight:800;letter-spacing:-.01em;width:100%}
+.ph button.p-issue{color:var(--white)}
+.ph button.p-issue.off{color:var(--navy)}
+.p-issue:active{background:#4521B8}
+.p-issue.off{background:var(--white);color:var(--navy);border:3px dashed var(--navy);font-size:18px;font-weight:700}
+.p-two{display:flex;gap:10px;flex:1;min-height:0}
+.p-two .p-ghost{height:auto;flex:1;font-size:17px}
+.p-two .p-issue{flex:1.4;font-size:20px}
+.p-meter{height:6px;background:var(--line);border-radius:3px;overflow:hidden;flex:none}
+.p-meter i{display:block;height:100%;background:var(--navy)}
+.p-done{display:flex;flex-direction:column;flex:1;min-height:0;padding:12px 12px 0;gap:10px}
+.p-ok{background:var(--teal);color:var(--white);border-radius:18px;padding:12px 16px 14px;flex:none}
+.p-ok .h{font-size:14px;font-weight:700}
+.p-ok .n{font-family:var(--font-num);font-size:72px;font-weight:500;line-height:1.05;letter-spacing:-.03em}
+.p-ok .s{font-size:15px;font-weight:600}
+.p-lab{font-size:13px;font-weight:700;color:var(--ink2)}
+.p-chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.p-chips button{height:56px;border:2px solid var(--navy);background:var(--white);border-radius:12px;font-family:var(--font-num);font-size:17px;font-weight:500;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.p-chips button small{font-family:var(--font-ui);font-size:11px;font-weight:700;color:var(--ink2)}
+.p-chips button.on{background:var(--navy);color:var(--white)}
+.p-chips button.on small{color:var(--white)}
+.p-toast{position:absolute;left:12px;right:12px;top:118px;background:var(--navy);color:var(--white);border-radius:12px;padding:10px 14px;font-weight:700;font-size:14px}
+
+/* Edge gallery */
+.edge{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.edge article{border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.edge .frag{background:var(--paper);padding:16px;min-height:168px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.edge .txt{padding:16px;display:flex;flex-direction:column;gap:6px}
+.edge .txt p{font-size:.92rem;color:var(--ink2)}
+.f-bar{background:var(--navy);color:var(--white);border-radius:12px;padding:6px 6px 6px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700;font-size:14px}
+.f-bar button{background:var(--white);color:var(--navy);border:0;border-radius:8px;font-weight:800;font-size:14px;height:44px;padding:0 14px;font-family:inherit}
+.f-meter{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.f-meter i{display:block;height:100%;background:var(--navy);width:70%}
+.f-banner{border-radius:12px;padding:12px 14px;font-weight:700;font-size:14px;display:flex;gap:10px;align-items:center}
+.f-banner.amb{background:var(--amber-t);color:var(--amber)}
+.f-banner.rose{background:var(--rose-t);color:var(--rose)}
+.f-btn{border:2px solid var(--navy);background:var(--white);border-radius:10px;height:48px;font-weight:700;font-size:14px;font-family:inherit;padding:0 14px;color:var(--navy)}
+.f-btn.v{background:var(--violet);border-color:var(--violet);color:var(--white)}
+.f-btn.t{background:var(--teal);border-color:var(--teal);color:var(--white)}
+.f-row{display:flex;gap:8px;flex-wrap:wrap}
+.f-row .f-btn{flex:1}
+.f-qr{display:flex;gap:12px;align-items:center}
+.f-qr svg{width:64px;height:64px;flex:none;background:var(--white);border:2px solid var(--navy);padding:3px}
+.f-stop{background:var(--white);border:2px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700}
+.f-stop .badge{background:var(--violet);color:var(--white);border-radius:999px;padding:2px 12px;font-weight:800}
+.f-stop .fare{font-family:var(--font-num);font-weight:500;font-size:18px}
+.f-sum{font-family:var(--font-num);font-size:14px;display:flex;flex-direction:column;gap:6px}
+.f-sum div{display:flex;justify-content:space-between;gap:10px}
+.f-sum .ok{color:var(--teal);font-weight:500}
+
+/* Tests, AI note */
+.tests{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 40px}
+.tests div{border-top:3px solid var(--navy);padding-top:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.tests .bar-line{font-size:.92rem;color:var(--ink2)}
+.ai{background:var(--navy);color:var(--white);border-radius:20px;padding:28px 30px;display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.ai p{max-width:62ch}
+footer{padding-block:36px 56px;border-top:1px solid var(--line);color:var(--ink2);font-size:.92rem}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:minmax(0,1fr);gap:40px}
+  .two,.obs,.dec,.tests,.layers,.reach{grid-template-columns:minmax(0,1fr)}
+  .proto{grid-template-columns:minmax(0,1fr);justify-items:start}
+  .proto .ph{justify-self:center}
+  .sec{padding-block:48px}
+}
+@media (max-width:440px){
+  .ticket{transform:rotate(-1.2deg);box-shadow:5px 5px 0 var(--violet-t);max-width:calc(100% - 8px)}
+  .eyebrow{font-size:1.4rem}
+  body{font-size:16px}
+  .layer{grid-template-columns:minmax(0,1fr);gap:6px}
+  .tl-p em{display:none}
+}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}html{scroll-behavior:auto}}
+</style>
+
+
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Nielsen Product Design Internship · Brief: The Conductor's Digital Companion</p>
+    <h1>Three tickets, four taps, <span class="mark">one hand.</span></h1>
+    <p class="lede">A ticketing app for a Delhi bus conductor who sells to a full bus with cash in one hand and the device in the other. Every choice below answers one of three limits from the brief.</p>
+    <div class="cons" aria-label="Brief constraints">
+      <span>One-handed</span><span>3 passengers in under 4 s</span><span>Readable in glare</span>
+    </div>
+    <div class="by">
+      <b>Shubham Prasad</b>
+      <span>B.Tech student, Mathematics and Computing, Delhi Technological University</span>
+    </div>
+  </div>
+  <div class="ticket" role="img" aria-label="Sample thermal ticket: Kashmere Gate to Red Fort, 3 passengers, 30 rupees">
+    <div class="t-h">DELHI BUS · AC LOW-FLOOR</div>
+    <div class="t-s">SAMPLE DATA · NOT VALID</div>
+    <hr>
+    <div>KASHMERE GATE</div>
+    <div>→ RED FORT</div>
+    <div class="t-r"><span>3 × ₹10</span><span>#0048</span></div>
+    <div class="t-big">₹30</div>
+    <div class="hand">the paper strip this app replaces</div>
+  </div>
+</header>
+
+<!-- 1 PROBLEM -->
+<section class="sec" id="problem">
+  <div class="sec-head">
+    <p class="eyebrow">Problem, user and assumptions</p>
+    <h2>The conductor has one free hand, and the bus keeps moving.</h2>
+  </div>
+  <div class="two">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <p class="body">The brief asks for a digital version of the thermal-printer ticketing machine. A conductor keeps selling through a jerky ride, often while collecting cash. Looking down for more than a glance means missing a passenger or losing balance.</p>
+      <p class="body">I treat the job as three tasks done in order: choose a stop, count passengers, issue. The design removes every step that is not one of those, and puts what remains where one thumb lands without moving the grip.</p>
+      <p class="body"><span class="flag">Fares and schemes are sample data</span> They are illustrative and not taken from DTC operations. They would be verified against official DTC and Delhi Government sources before any real use.</p>
+    </div>
+    <dl class="assume">
+      <dt>System</dt><dd>Delhi buses (DTC and cluster), non-AC and AC low-floor.</dd>
+      <dt>Device</dt><dd>Android handheld or phone, portrait, about 6 inches.</dd>
+      <dt>Language</dt><dd>Hindi (Devanagari) and English.</dd>
+      <dt>Network</dt><dd>GPS is available but unreliable, so manual override always exists.</dd>
+      <dt>Printing</dt><dd>Bluetooth thermal printer, or a digital ticket.</dd>
+      <dt>User</dt><dd>A conductor trained on the app. Not a first-time user.</dd>
+      <dt>Data</dt><dd>Built from public information and observation. No inside access.</dd>
+    </dl>
+  </div>
+</section>
+
+<!-- 2 OBSERVATIONS -->
+<section class="sec" id="observations">
+  <div class="sec-head">
+    <p class="eyebrow">Observations</p>
+    <h2>What I saw, and the situations I designed for.</h2>
+  </div>
+  <div class="obs">
+    <article>
+      <h3>Mehrauli to Hauz Khas</h3>
+      <p>A packed bus, and a lot of passengers made the whole trip without being issued a ticket.</p>
+      <p class="scen">Picture a weekday evening with standing room only. The conductor works down the aisle with one hand on a rail and cash in the other. Passengers call out a stop and hold out a note, and the next stop comes before the last sale is done.</p>
+    </article>
+    <article>
+      <h3>DTU Gate to Rohini and Badli</h3>
+      <p>The same crush on this route, and again many people rode without a ticket.</p>
+      <p class="scen">Picture a rush hour with students and office workers boarding together. Friends buy as a group of two to four for one stop, and many hold a large note and wait for change.</p>
+    </article>
+    <article>
+      <h3>What has been reported</h3>
+      <p>In 2025 the conductors' union said the machines sometimes skip ticket serial numbers. Inspectors then see more tickets than passengers and send conductors notices, so the conductor is blamed for a printing fault. <a href="https://www.etvbharat.com/en/!state/delhi-bus-conductors-in-trouble-due-to-ticket-number-error-union-complains-enn25051604106" target="_blank" rel="noopener">ETV Bharat</a></p>
+      <p>Free travel for women is moving from a paper pink ticket to a card tapped on the conductor's machine. Reports say it is unclear what happens when a card does not scan. <a href="https://www.medianama.com/2025/12/223-dtc-aadhaar-mandatory-pink-saheli-bus-card-delhi/" target="_blank" rel="noopener">MediaNama</a></p>
+      <p>A 2022 Daily Pioneer report is headlined with passengers asking conductors to come to them for tickets. <a href="https://www.dailypioneer.com/2022/state-editions/passengers-want-dtc-bus-conductors-to-reach-them-for-issuing-tickets.html" target="_blank" rel="noopener">Daily Pioneer</a></p>
+      <p>In Indore, a different city, commuters said rush hour brought wrong fares and arguments over change when they had no exact amount. That is why the change screen exists. <a href="https://www.freepressjournal.in/amp/indore/indore-news-upi-system-ends-fare-disputes-in-ibuses-digital-payments-bring-transparency-reduce-disputes-and-ease-commuting-experience" target="_blank" rel="noopener">Free Press Journal</a></p>
+    </article>
+  </div>
+  <div class="learned">
+    <h3>What this changed in the design</h3>
+    <ul>
+      <li><b>Speed first.</b> On a packed bus the conductor cannot reach everyone, so a sale has to take seconds. A group is issued by repeat taps on one row, and Repeat last covers regular groups.</li>
+      <li><b>An unbroken ticket log.</b> Every ticket is numbered and stored in order, and every undo is recorded. A mismatch can then be traced to a cause instead of landing on the conductor. The end-of-trip summary is built on this.</li>
+      <li><b>Free travel needs a fallback.</b> The card tap is the main path. If the card does not scan, the conductor can still issue a free ticket with one extra tap, so the passenger is never refused.</li>
+      <li><b>Tickets from where the conductor stands.</b> The screen is made for one hand in the aisle, so the conductor can sell without going back to a seat.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 3 REACHABILITY -->
+<section class="sec" id="reach">
+  <div class="sec-head">
+    <p class="eyebrow">Reachability strategy</p>
+    <h2>Everything that is tapped sits where the thumb already is.</h2>
+    <p class="lede">The thumb pivots from the bottom corner of the grip. The lower part of the screen is easy, the middle is a stretch, and the top is out of reach without shifting the grip. So the top only shows information, and every control lives below it.</p>
+  </div>
+  <div class="reach" id="reach-figs"></div>
+  <div class="legend" aria-label="Zone legend">
+    <span><i style="background:#CDEFE8"></i>Easy: repeated taps and Issue</span>
+    <span><i style="background:#FFE9B8"></i>Stretch: farther stops, read often</span>
+    <span><i style="background:#F9D9D6"></i>Hard: glance only, nothing to tap</span>
+  </div>
+  <p class="sample-note" style="margin-top:12px">Illustrative thumb map for a 6 inch phone. Not measured. Validating it with conductors is the first test below.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Control</th><th>Zone</th><th>Size (dp)</th><th>Why there</th></tr></thead>
+      <tbody>
+        <tr><td>Issue</td><td class="z e">Easy</td><td>92 tall, full width</td><td>Pressed on every sale. Biggest target, nearest the thumb base, so a jerk still lands on it.</td></tr>
+        <tr><td>Repeat last</td><td class="z e">Easy</td><td>56 tall</td><td>Groups often buy the same ticket again. It sits beside the total, away from Issue.</td></tr>
+        <tr><td>Nearest three stops</td><td class="z e">Easy</td><td>72 tall, full width</td><td>The likeliest stop is the lowest row. Extra passengers are repeat taps on that row.</td></tr>
+        <tr><td>Farther stops</td><td class="z s">Stretch</td><td>72 tall, full width</td><td>Rarer sales. A longer reach is acceptable and they read like the route going up.</td></tr>
+        <tr><td>Stop, next stop, totals</td><td class="z h">Hard</td><td>Read only</td><td>Checked by eye, never tapped, so it can live outside the thumb's reach.</td></tr>
+        <tr><td>Left-hand mirror</td><td class="z e">Setting</td><td>One toggle</td><td>Flips the layout so a left-handed conductor gets the same easy zone.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 4 DECISIONS -->
+<section class="sec" id="decisions">
+  <div class="sec-head">
+    <p class="eyebrow">Key decisions with rationale</p>
+    <h2>Each choice answers a physical problem on the bus.</h2>
+  </div>
+  <div class="dec">
+    <article>
+      <h3>Tap the stop again to add a passenger</h3>
+      <p class="body">The target is already under the thumb. A stepper or keypad adds a second target to find while the bus sways.</p>
+      <p class="cost"><b>Cost:</b> a mis-tap adds a passenger. Touch and hold on the row removes one.</p>
+    </article>
+    <article>
+      <h3>One wide Issue button at the bottom</h3>
+      <p class="body">It is the most pressed control, so it is the largest and nearest the thumb. Its label carries the total, so the amount is checked before it is pressed.</p>
+      <p class="cost"><b>Cost:</b> it takes space from the list. Five stops fit, and the list is ordered by likelihood.</p>
+    </article>
+    <article>
+      <h3>Actions fire on touch-up, with a short debounce</h3>
+      <p class="body">A jerk drops the finger on the wrong place. Firing on release lets the conductor slide off a wrong target to cancel. A short debounce ignores double taps caused by the bounce.</p>
+      <p class="cost"><b>Cost:</b> a slightly later response. It is small enough to stay inside the 4 second budget.</p>
+    </article>
+    <article>
+      <h3>A light, high-contrast theme</h3>
+      <p class="body">Navy on white, in heavy weights, with no thin lines or pale greys. Small text is never below 12 px, and numbers are large. Sunlight washes out low-contrast screens first.</p>
+      <p class="cost"><b>Cost:</b> a bright screen at night. A night theme is a next step.</p>
+    </article>
+    <article>
+      <h3>Hindi and English on every stop</h3>
+      <p class="body">Both names show on each row, with Hindi in Devanagari. A toggle picks which one leads, and it never adds a step to a sale.</p>
+      <p class="cost"><b>Cost:</b> a taller row. It is worth it so passengers can also read the stop.</p>
+    </article>
+    <article>
+      <h3>Feedback without looking</h3>
+      <p class="body">Three haptic patterns tell success, error and undo apart in the hand. A short optional tone backs them up in noisy traffic.</p>
+      <div class="hap" aria-label="Haptic patterns">
+        <div><span><i class="s"></i></span>Issued</div>
+        <div><span><i class="s"></i><i class="s"></i><i class="s"></i></span>Error</div>
+        <div><span><i class="l"></i></span>Undo</div>
+      </div>
+    </article>
+  </div>
+
+  <div class="layers">
+    <div>
+      <h3 style="margin-bottom:16px">Three layers on every screen</h3>
+      <div class="layer g"><b>Glance</b><span>Now and next stop, tickets issued, the day's collection. Read, never tapped.</span></div>
+      <div class="layer c"><b>Choose</b><span>The stop list with the fare on each row. The only decision that varies per sale.</span></div>
+      <div class="layer a"><b>Act</b><span>Passenger count, total and Issue, in the thumb zone.</span></div>
+    </div>
+    <div>
+      <h3>What was cut from the main screen</h3>
+      <p class="body" style="margin-top:8px">If a number does not help the next decision, it moves to a secondary screen.</p>
+      <div class="cut"><span>Route map</span><span>Ticket history</span><span>Category pickers</span><span>Settings</span><span>Seat count</span><span>Clock</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 FLOW -->
+<section class="sec" id="flow">
+  <div class="sec-head">
+    <p class="eyebrow">High-fidelity flow</p>
+    <h2>Try it. Tap Red Fort three times, then Issue.</h2>
+    <p class="lede">This phone is live. It uses the same screens as the frames below, with sample fares. A stopwatch runs from your first tap to Issue.</p>
+  </div>
+  <div class="proto">
+    <div class="proto-side">
+      <ol class="steps">
+        <li><span><b>Tap the stop.</b> It counts one passenger.</span></li>
+        <li><span><b>Tap the same stop again</b> for each extra passenger. Hold a row to remove one.</span></li>
+        <li><span><b>Tap Issue.</b> Then tap the note handed over to see the change, or Next ticket.</span></li>
+      </ol>
+      <div class="clock" aria-live="polite">
+        <span class="eyebrow">Last sale</span>
+        <span class="big" id="clk-time">–.– s</span>
+        <span class="v" id="clk-verdict">Make a sale to start the stopwatch.</span>
+        <div class="bar" aria-hidden="true"><i id="clk-bar"></i><b></b></div>
+        <span class="sample-note" id="clk-taps">The marker is the 4 second limit from the brief.</span>
+      </div>
+      <button class="mini-btn" id="proto-reset" type="button">Reset prototype</button>
+      <p class="sample-note">Sample stops and fares. Not official data. Your own speed on a desk is faster than on a moving bus, so this shows the tap count more than the real time.</p>
+    </div>
+    <div class="ph" id="live" role="application" aria-label="Interactive ticketing prototype"></div>
+  </div>
+
+  <div class="timeline">
+    <h3>Where the 4 seconds go</h3>
+    <p class="body" style="margin-top:6px">Three passengers to one stop is four taps. I assumed about 0.6 s per tap on a moving bus. That is an estimate to be measured, not a result.</p>
+    <div class="tl-axis" role="img" aria-label="Timeline of four taps ending at about 2.5 seconds, against a 4 second limit">
+      <div class="tl-p" style="left:6.25%"><span>0.6 s</span><i></i><em>Stop</em></div>
+      <div class="tl-p" style="left:13.75%"><span>1.2 s</span><i></i><em>Again</em></div>
+      <div class="tl-p" style="left:21.25%"><span>1.8 s</span><i></i><em>Again</em></div>
+      <div class="tl-p t" style="left:31.25%"><span>2.5 s</span><i></i><em>Issue</em></div>
+      <div class="tl-limit" style="left:calc(100% - 3px)"><span>4 s limit</span></div>
+    </div>
+    <p class="sample-note" style="margin-top:34px">Close to 1.5 s of headroom for a missed tap or a jerk.</p>
+  </div>
+
+  <div class="frames" id="frames"></div>
+</section>
+
+<!-- 6 EDGE CASES -->
+<section class="sec" id="edge">
+  <div class="sec-head">
+    <p class="eyebrow">Edge-case gallery</p>
+    <h2>When something goes wrong, the screen says what to do next.</h2>
+    <p class="lede">Every message names what happened and the next action. None of them blocks the next sale.</p>
+  </div>
+  <div class="edge" id="edge-grid"></div>
+</section>
+
+<!-- 7 NEXT -->
+<section class="sec" id="next">
+  <div class="sec-head">
+    <p class="eyebrow">What I would test next with real conductors</p>
+    <h2>Five checks, each with a pass mark.</h2>
+  </div>
+  <div class="tests">
+    <div><h3>Time to issue</h3><p class="body">Five conductors, ten three-passenger sales each, on a moving bus.</p><p class="bar-line">Pass mark: at least 9 of 10 sales under 4 s.</p></div>
+    <div><h3>Reach map</h3><p class="body">Mark where each thumb lands with the phone held as they normally do. Redraw the zones from that.</p><p class="bar-line">Pass mark: Issue and the nearest three stops inside the easy zone for every conductor.</p></div>
+    <div><h3>Glare</h3><p class="body">Read the glance layer and fare column outdoors at noon, at arm's length.</p><p class="bar-line">Pass mark: every number read correctly on the first look.</p></div>
+    <div><h3>Mis-tap and undo</h3><p class="body">Watch for wrong counts and wrong stops. See whether touch and hold and the undo bar are found without help.</p><p class="bar-line">Pass mark: errors corrected in under 3 s, with no explanation.</p></div>
+    <div><h3>Left hand and Hindi</h3><p class="body">Run the mirror layout and the Hindi-first setting with the conductors who use them.</p><p class="bar-line">Pass mark: the same sale times as the default layout.</p></div>
+    <div><h3>With another week</h3><p class="body">A night theme, a longer route with many stages, and a real fare table checked against official sources.</p><p class="bar-line">Then a printer test with the real receipt width.</p></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var STOPS=[
+    {en:'Red Fort',hi:'लाल किला',fare:10},
+    {en:'Chandni Chowk',hi:'चांदनी चौक',fare:10},
+    {en:'Delhi Gate',hi:'दिल्ली गेट',fare:15},
+    {en:'ITO',hi:'आईटीओ',fare:15},
+    {en:'Pragati Maidan',hi:'प्रगति मैदान',fare:20}
+  ];
+  function money(n){return '₹'+Number(n).toLocaleString('en-IN');}
+
+  function topHTML(st){
+    return '<div class="p-top">'+
+      '<div class="p-row"><span class="p-chip">Sample route</span>'+
+      '<span class="p-stat"><i class="dot"></i>Online</span>'+
+      '<span class="p-stat">हिं | EN</span><span class="p-stat">82%</span></div>'+
+      '<div class="p-row p-now"><div><small>NOW</small><b>Kashmere Gate</b></div>'+
+      '<div class="r"><small>NEXT</small><b>Red Fort</b></div></div>'+
+      '<div class="p-row p-tot"><span><b>'+st.issuedN+'</b> tickets</span><span><b>'+money(st.collection)+'</b> today</span></div>'+
+      '</div>';
+  }
+
+  function readyHTML(st){
+    var total=st.stop!=null?STOPS[st.stop].fare*st.count:0;
+    var rows='';
+    for(var i=STOPS.length-1;i>=0;i--){
+      var s=STOPS[i],sel=st.stop===i;
+      rows+='<button type="button" class="p-stop'+(sel?' sel':'')+'" data-act="stop" data-i="'+i+'">'+
+        '<span class="nm"><b>'+s.en+'</b><em lang="hi">'+s.hi+'</em></span>'+
+        (sel?'<span class="badge">×'+st.count+'</span>':'<span></span>')+
+        '<span class="fare">'+money(s.fare)+'</span></button>';
+    }
+    var sum=total?(st.count+' × '+money(STOPS[st.stop].fare)+' = '+money(total)):'Pick a stop';
+    return topHTML(st)+
+      '<div class="p-lh">Likeliest stop is nearest your thumb</div>'+
+      '<div class="p-list">'+rows+'</div>'+
+      '<div class="p-bot"><div class="p-sum">'+
+      '<button type="button" class="p-ghost" data-act="repeat"'+(st.last?'':' disabled')+'>↻ Repeat last</button>'+
+      '<span class="sumtxt">'+sum+'</span></div>'+
+      (total?'<button type="button" class="p-issue" data-act="issue">Issue '+money(total)+'</button>'
+            :'<button type="button" class="p-issue off" data-act="issue" aria-disabled="true">Tap a stop to start</button>')+
+      '</div>';
+  }
+
+  function chipsHTML(st){
+    var t=st.sale.total;
+    var vals=[t,50,100,200,500].filter(function(v,i){return i===0||v>t;}).slice(0,4);
+    return vals.map(function(v,i){
+      return '<button type="button" class="'+(st.tendered===v?'on':'')+'" data-act="tender" data-v="'+v+'">'+money(v)+(i===0?'<small>Exact</small>':'')+'</button>';
+    }).join('');
+  }
+
+  function doneHTML(st){
+    var s=st.sale,stp=STOPS[s.stop],chg=st.screen==='change';
+    var change=chg?st.tendered-s.total:0;
+    var head=chg?(change>0?'Change due':'Exact amount'):'✓ Issued · printing';
+    var big=chg?(change>0?money(change):'No change'):money(s.total);
+    var sub=chg?(money(st.tendered)+' tendered − '+money(s.total)+' fare'):(s.count+' × '+stp.en+' · AC');
+    var left=Math.max(0,st.undoLeft);
+    var bigStyle=(chg&&change<=0)?' style="font-size:48px;line-height:1.5"':'';
+    return topHTML(st)+
+      '<div class="p-done"><div class="p-ok"><div class="h">'+head+'</div><div class="n"'+bigStyle+'>'+big+'</div><div class="s">'+sub+'</div></div>'+
+      '<div class="p-lab">'+(chg?'Cash tendered':'Cash tendered? Tap the note handed over')+'</div>'+
+      '<div class="p-chips">'+chipsHTML(st)+'</div></div>'+
+      '<div class="p-bot"><div class="p-meter"><i style="width:'+(left*10)+'%"></i></div>'+
+      '<div class="p-sum s"><span class="sumtxt" style="text-align:left">Ticket #00'+(st.issuedN)+' · '+(left>0?'Undo for '+left+' s':'Undo closed')+'</span></div>'+
+      '<div class="p-two"><button type="button" class="p-ghost" data-act="undo"'+(left>0?'':' disabled')+'>↶ Undo</button>'+
+      '<button type="button" class="p-issue" data-act="next">Next ticket</button></div></div>';
+  }
+
+  function screenHTML(st){
+    var h=(st.screen==='ready')?readyHTML(st):doneHTML(st);
+    if(st.toast)h+='<div class="p-toast" role="status">'+st.toast+'</div>';
+    return h;
+  }
+
+  /* ---- Live prototype ---- */
+  var live=document.getElementById('live');
+  var st,t0,taps,held,holdTimer,tick;
+  function fresh(){
+    st={screen:'ready',stop:null,count:0,last:{stop:2,count:2},issuedN:47,collection:1240,sale:null,tendered:null,undoLeft:10,toast:''};
+    t0=0;taps=0;held=false;
+    clearInterval(tick);
+    clkReset();
+    draw();
+  }
+  function draw(){live.innerHTML=screenHTML(st);}
+  function clkReset(){
+    document.getElementById('clk-time').textContent='–.– s';
+    var v=document.getElementById('clk-verdict');v.textContent='Make a sale to start the stopwatch.';v.className='v';
+    document.getElementById('clk-bar').style.width='0';
+    document.getElementById('clk-taps').textContent='The marker is the 4 second limit from the brief.';
+  }
+  function clkShow(sec,n){
+    var ok=sec<4;
+    document.getElementById('clk-time').textContent=sec.toFixed(1)+' s';
+    var v=document.getElementById('clk-verdict');
+    v.textContent=ok?'Under 4 seconds':'Over 4 seconds';v.className='v '+(ok?'ok':'slow');
+    document.getElementById('clk-bar').style.width=Math.min(100,sec/4*100)+'%';
+    document.getElementById('clk-taps').textContent=n+' taps from first tap to Issue.';
+  }
+  function startTick(){
+    clearInterval(tick);
+    tick=setInterval(function(){
+      if(st.screen==='ready'||st.undoLeft<=0){clearInterval(tick);return;}
+      st.undoLeft--;draw();
+    },1000);
+  }
+  function now(){return (window.performance&&performance.now)?performance.now():Date.now();}
+  function act(a,el){
+    st.toast='';
+    if(a==='stop'&&st.screen==='ready'){
+      var i=+el.getAttribute('data-i');
+      if(!t0){t0=now();taps=0;}
+      taps++;
+      if(st.stop===i){st.count++;}else{st.stop=i;st.count=1;}
+    }else if(a==='repeat'&&st.screen==='ready'&&st.last){
+      if(!t0){t0=now();taps=0;}
+      taps++;st.stop=st.last.stop;st.count=st.last.count;
+    }else if(a==='issue'&&st.screen==='ready'&&st.stop!=null){
+      taps++;
+      var sec=(now()-t0)/1000,fare=STOPS[st.stop].fare*st.count;
+      st.sale={stop:st.stop,count:st.count,total:fare};
+      st.issuedN++;st.collection+=fare;st.last={stop:st.stop,count:st.count};
+      st.stop=null;st.count=0;st.screen='issued';st.tendered=null;st.undoLeft=10;
+      clkShow(sec,taps);t0=0;taps=0;startTick();
+    }else if(a==='tender'&&st.screen!=='ready'){
+      st.tendered=+el.getAttribute('data-v');st.screen='change';
+    }else if(a==='next'&&st.screen!=='ready'){
+      st.screen='ready';clearInterval(tick);
+    }else if(a==='undo'&&st.screen!=='ready'&&st.undoLeft>0){
+      st.issuedN--;st.collection-=st.sale.total;st.screen='ready';clearInterval(tick);
+      st.toast='Ticket cancelled. Nothing was charged.';
+      setTimeout(function(){if(st.toast){st.toast='';draw();}},2200);
+    }else{return;}
+    draw();
+  }
+  live.addEventListener('click',function(e){
+    var el=e.target.closest('[data-act]');
+    if(!el)return;
+    if(held){held=false;return;}
+    act(el.getAttribute('data-act'),el);
+  });
+  live.addEventListener('pointerdown',function(e){
+    held=false;
+    var el=e.target.closest('[data-act="stop"]');
+    clearTimeout(holdTimer);
+    if(!el||st.screen!=='ready')return;
+    var i=+el.getAttribute('data-i');
+    if(st.stop!==i||st.count<1)return;
+    holdTimer=setTimeout(function(){
+      held=true;st.count--;if(st.count<1){st.stop=null;st.count=0;}
+      st.toast='Removed one passenger';draw();
+      setTimeout(function(){st.toast='';draw();},1200);
+    },550);
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+    live.addEventListener(ev,function(){clearTimeout(holdTimer);});
+  });
+  document.getElementById('proto-reset').addEventListener('click',fresh);
+  fresh();
+
+  /* ---- Static frames ---- */
+  var base={issuedN:47,collection:1240,last:{stop:2,count:2},undoLeft:10,tendered:null};
+  function mk(o){var r={};for(var k in base)r[k]=base[k];for(var j in o)r[j]=o[j];return r;}
+  var sale={stop:0,count:3,total:30};
+  var frames=[
+    {t:'Ready',w:'The list is the work, so it takes the middle. The likeliest stop is the lowest row, nearest the thumb. Repeat last sits beside the total.',s:mk({screen:'ready',stop:null,count:0})},
+    {t:'First passenger',w:'One tap picks the stop and counts one passenger. The count shows on the row that was tapped, so there is no separate stepper to find.',s:mk({screen:'ready',stop:0,count:1})},
+    {t:'Three passengers',w:'Two more taps on the same row. The Issue label becomes ₹30, so the total is checked in the same glance as the press.',s:mk({screen:'ready',stop:0,count:3})},
+    {t:'Issued',w:'The total in 72 px numerals on teal, the colour used only for done. Undo and Next ticket share one row at full height.',s:mk({screen:'issued',sale:sale,issuedN:48,collection:1270,undoLeft:8})},
+    {t:'Change due',w:'One tap on the note handed over gives the change. No arithmetic while the bus is moving.',s:mk({screen:'change',sale:sale,issuedN:48,collection:1270,undoLeft:6,tendered:50})}
+  ];
+  var fh='';
+  frames.forEach(function(f){
+    fh+='<figure><div class="ph static" aria-hidden="true">'+screenHTML(f.s)+'</div><figcaption><b>'+f.t+'</b><span>'+f.w+'</span></figcaption></figure>';
+  });
+  fh+='<div class="cutcard"><span class="eyebrow">The five frames</span><h3>What is not on screen</h3>'+
+      '<p class="body">No stop map, no history, no category pickers. Child, concession and pass options sit one tap off the main path. They are used less than once in ten sales.</p>'+
+      '<p class="body">Each of the five frames passes the same test: does every number help the next decision?</p></div>';
+  document.getElementById('frames').innerHTML=fh;
+
+  /* ---- Reachability SVGs ---- */
+  function reachSVG(mirror){
+    var g='<defs><clipPath id="c'+(mirror?'l':'r')+'"><rect x="22" y="12" width="156" height="356" rx="22"/></clipPath></defs>'+
+      '<g'+(mirror?' transform="translate(200,0) scale(-1,1)"':'')+'>'+
+      '<rect x="20" y="10" width="160" height="360" rx="26" fill="#F9D9D6" stroke="#0F1B3D" stroke-width="4"/>'+
+      '<g clip-path="url(#c'+(mirror?'l':'r')+')">'+
+      '<circle cx="176" cy="350" r="290" fill="#FFE9B8"/>'+
+      '<circle cx="176" cy="350" r="190" fill="#CDEFE8"/>'+
+      '<rect x="22" y="12" width="156" height="60" fill="#0F1B3D" opacity=".88"/>'+
+      '<rect x="30" y="22" width="60" height="9" rx="3" fill="#fff"/><rect x="108" y="22" width="60" height="9" rx="3" fill="#fff"/>'+
+      '<rect x="30" y="42" width="40" height="7" rx="3" fill="#fff" opacity=".8"/><rect x="108" y="42" width="60" height="7" rx="3" fill="#fff" opacity=".8"/>'+
+      '<g stroke="#0F1B3D" stroke-width="2" fill="none" opacity=".55">'+
+      '<line x1="22" y1="125" x2="178" y2="125"/><line x1="22" y1="162" x2="178" y2="162"/><line x1="22" y1="198" x2="178" y2="198"/><line x1="22" y1="235" x2="178" y2="235"/><line x1="22" y1="272" x2="178" y2="272"/></g>'+
+      '<g fill="#0F1B3D" opacity=".75"><rect x="30" y="100" width="60" height="8" rx="3"/><rect x="30" y="137" width="70" height="8" rx="3"/><rect x="30" y="174" width="56" height="8" rx="3"/><rect x="30" y="211" width="30" height="8" rx="3"/><rect x="30" y="248" width="56" height="8" rx="3"/></g>'+
+      '<rect x="30" y="282" width="62" height="26" rx="8" fill="#fff" stroke="#0F1B3D" stroke-width="2.5"/>'+
+      '<rect x="30" y="314" width="140" height="44" rx="10" fill="#5B2EE0"/>'+
+      '</g>'+
+      '<circle cx="176" cy="350" r="9" fill="#0F1B3D"/>'+
+      '</g>';
+    return '<svg viewBox="0 0 200 380" role="img" aria-label="'+(mirror?'Left':'Right')+' hand thumb zone map">'+g+'</svg>';
+  }
+  document.getElementById('reach-figs').innerHTML=
+    '<figure>'+reachSVG(false)+'<figcaption>Right hand. Dot marks the thumb base.</figcaption></figure>'+
+    '<figure>'+reachSVG(true)+'<figcaption>Left hand. The same layout, mirrored.</figcaption></figure>';
+
+  /* ---- Edge gallery ---- */
+  function qr(){
+    var s=11,seed=7,out='<svg viewBox="0 0 66 66" aria-hidden="true">';
+    function fin(x,y){return (x<3&&y<3)||(x>s-4&&y<3)||(x<3&&y>s-4);}
+    for(var y=0;y<s;y++)for(var x=0;x<s;x++){
+      seed=(seed*1103515245+12345)&0x7fffffff;
+      var on=fin(x,y)||((seed>>8)%2===0);
+      if(on)out+='<rect x="'+x*6+'" y="'+y*6+'" width="6" height="6" fill="#0F1B3D"/>';
+    }
+    return out+'</svg>';
+  }
+  var edge=[
+    {t:'Wrong ticket',f:'<div class="f-bar"><span>#0048 · ₹30 issued</span><button type="button">↶ Undo</button></div><div class="f-meter"><i></i></div>',
+     p:'Undo stays for 10 s and does not block the next sale. One long vibration confirms the cancel.'},
+    {t:'Offline',f:'<div class="f-banner amb"><i class="dot amb"></i>Offline · 6 tickets saved on this device</div>',
+     p:'Selling carries on. Tickets queue and sync when the network returns. A small dot changes, not an alarm.'},
+    {t:'Printer or paper unavailable',f:'<div class="f-banner rose">Paper finished or printer not responding</div><div class="f-qr">'+qr()+'<div class="f-row" style="flex:1"><button class="f-btn v" type="button">Show QR ticket</button></div></div>',
+     p:'Passengers still get a ticket. Show the QR now, then load paper or retry print when there is time.'},
+    {t:'Free travel category',f:'<div class="f-row"><button class="f-btn" type="button">Standard</button><button class="f-btn" type="button" style="background:var(--navy);color:#fff">Pink Saheli · free</button></div><button class="f-btn t" type="button" style="height:56px;font-size:17px">Issue free ticket ₹0</button>',
+     p:'The scheme sits one tap above Issue, off the main path. Scheme rules shown are sample data.'},
+    {t:'Stage or direction changes',f:'<div class="f-banner" style="background:var(--violet-t);color:var(--navy)">Next stage: now showing ITO and onward</div><div class="f-row"><button class="f-btn" type="button">Wrong? Change stage</button></div>',
+     p:'The list moves on by itself. GPS can drift, so the override is one tap away.'},
+    {t:'Low battery',f:'<div class="f-banner amb">Battery 14% · Plug in the device</div><div class="f-sum"><div><span>Tickets not yet synced</span><span>9</span></div></div>',
+     p:'Shows below 20% and says what to do, not only the level. Unsynced tickets are listed so nothing is lost.'},
+    {t:'End of trip',f:'<div class="f-sum"><div><span>Tickets</span><span>62</span></div><div><span>Cash expected</span><span>₹1,240</span></div><div><span>Cash counted</span><span>₹1,240</span></div><div class="ok"><span>Matches</span><span>✓</span></div></div>',
+     p:'The conductor counts the cash and enters it. A difference shows the amount and which tickets to recheck.'},
+    {t:'Mis-tap on the count',f:'<div class="f-stop"><span>Red Fort</span><span class="badge">×4</span><span class="fare">₹10</span></div><p style="font-size:14px;font-weight:700">Touch and hold the row to remove one passenger</p>',
+     p:'A wrong tap is fixed on the same row, with the same thumb. The count drops from ×4 to ×3.'}
+  ];
+  var eh='';
+  edge.forEach(function(e){
+    eh+='<article><div class="frag">'+e.f+'</div><div class="txt"><h3>'+e.t+'</h3><p>'+e.p+'</p></div></article>';
+  });
+  document.getElementById('edge-grid').innerHTML=eh;
+})();
+</script>
+
+</body>
+</html>
